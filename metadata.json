@@ -1,0 +1,6 @@
+{
+  "name": "Bitsnail Technologies",
+  "description": "Bitsnail Technologies Pvt Ltd - Corporate telecom engineering, 4G/5G wireless network rollouts, RF survey, optimization, and certified OHS safety services.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
