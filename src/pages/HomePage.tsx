@@ -35,12 +35,12 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenInquiry }) => {
   const serviceIconMap: Record<string, React.ReactNode> = {
-    Radio: <Radio className="w-6 h-6 text-[#2B784E]" />,
-    Sliders: <Sliders className="w-6 h-6 text-[#2B784E]" />,
-    Cpu: <Cpu className="w-6 h-6 text-[#2B784E]" />,
-    TrendingUp: <TrendingUp className="w-6 h-6 text-[#2B784E]" />,
-    ShieldAlert: <ShieldAlert className="w-6 h-6 text-[#2B784E]" />,
-    FileCheck: <FileCheck className="w-6 h-6 text-[#2B784E]" />,
+    Radio: <Radio className="w-6 h-6" />,
+    Sliders: <Sliders className="w-6 h-6" />,
+    Cpu: <Cpu className="w-6 h-6" />,
+    TrendingUp: <TrendingUp className="w-6 h-6" />,
+    ShieldAlert: <ShieldAlert className="w-6 h-6" />,
+    FileCheck: <FileCheck className="w-6 h-6" />,
   };
 
   return (
@@ -75,7 +75,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenInquiry })
                 onClick={() => onOpenInquiry()}
                 className="w-full sm:w-auto px-8 py-3.5 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full font-bold text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
-                <span>Request Project Proposal</span>
+                <span>Inquire Now</span>
                 <ArrowRight className="w-4 h-4 text-[#C59B3F]" />
               </button>
 
@@ -84,7 +84,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenInquiry })
                 className="w-full sm:w-auto px-7 py-3.5 bg-white hover:bg-[#EAF3EE] text-[#163426] border border-[#DCE7E1] rounded-full font-bold text-sm flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer"
               >
                 <Phone className="w-4 h-4 text-[#C59B3F]" />
-                <span>Call Suresh: {COMPANY_INFO.phoneDisplay}</span>
+                <span>Call: {COMPANY_INFO.phoneDisplay}</span>
               </a>
             </div>
 
@@ -209,39 +209,39 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenInquiry })
           {TELECOM_SERVICES.map((service, index) => (
             <div
               key={service.id}
-              className="bg-white rounded-3xl border border-[#DCE7E1] p-7 shadow-sm hover:shadow-md hover:border-[#2B784E] transition-all flex flex-col justify-between group"
+              className="bg-white hover:bg-[#163426] rounded-3xl border border-[#DCE7E1] hover:border-[#2B784E] p-7 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group cursor-pointer"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center group-hover:scale-105 transition-transform">
-                    {serviceIconMap[service.iconName] || <Radio className="w-6 h-6 text-[#2B784E]" />}
+                  <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-[#2B784E] group-hover:text-white flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                    {serviceIconMap[service.iconName] || <Radio className="w-6 h-6" />}
                   </div>
-                  <span className="font-mono text-xs font-bold text-[#2B784E] bg-[#EAF3EE] px-2.5 py-1 rounded-full">
+                  <span className="font-mono text-xs font-bold text-[#2B784E] bg-[#EAF3EE] group-hover:bg-[#2B784E] group-hover:text-white px-2.5 py-1 rounded-full transition-colors duration-300">
                     0{index + 1}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-serif text-xl font-bold text-[#163426] group-hover:text-[#2B784E] transition-colors">
+                  <h3 className="font-serif text-xl font-bold text-[#163426] group-hover:text-white transition-colors duration-300">
                     {service.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#4A5D52] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#4A5D52] group-hover:text-[#D1E5DA] leading-relaxed transition-colors duration-300">
                     {service.shortDesc}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-[#EAF3EE] flex items-center justify-between">
+              <div className="mt-6 pt-4 border-t border-[#EAF3EE] group-hover:border-[#24523C] flex items-center justify-between transition-colors duration-300">
                 <button
                   onClick={() => onNavigate('services', service.id)}
-                  className="text-xs font-bold text-[#2B784E] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-bold text-[#2B784E] group-hover:text-[#F0B849] hover:underline flex items-center gap-1 cursor-pointer transition-colors duration-300"
                 >
                   <span>View Technical Scope</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => onOpenInquiry(service.title)}
-                  className="px-3 py-1.5 bg-[#EAF3EE] hover:bg-[#2B784E] text-[#163426] hover:text-white rounded-full text-xs font-bold transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 bg-[#EAF3EE] text-[#163426] group-hover:bg-[#2B784E] group-hover:text-white group-hover:hover:bg-[#34925F] rounded-full text-xs font-bold transition-all duration-300 cursor-pointer"
                 >
                   Inquire
                 </button>

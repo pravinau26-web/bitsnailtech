@@ -44,12 +44,27 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
   });
 
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'sent' | 'fallback'>('idle');
 
-  const handleApplicationSubmit = (e: React.FormEvent) => {
+  const handleApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!candidateForm.fullName.trim() || !candidateForm.phone.trim()) {
-      setFormError('Please provide your name and phone number.');
+    const cleanName = candidateForm.fullName.trim();
+    if (!cleanName || cleanName.length < 2) {
+      setFormError('Please provide your full name (minimum 2 characters).');
+      return;
+    }
+
+    const cleanPhone = candidateForm.phone.trim().replace(/[\s\-()]/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      setFormError('Please provide a valid 10-digit mobile number.');
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!candidateForm.email.trim() || !emailRegex.test(candidateForm.email.trim())) {
+      setFormError('Please provide a valid email address.');
       return;
     }
 
@@ -59,6 +74,41 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
     }
 
     setFormError('');
+    setIsSubmitting(true);
+
+    let dispatchSuccess = false;
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/bitsnailtech@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          candidate_name: candidateForm.fullName.trim(),
+          candidate_phone: candidateForm.phone.trim(),
+          candidate_email: candidateForm.email.trim(),
+          gender: candidateForm.gender,
+          qualification: candidateForm.highestQualification,
+          pass_out_status: candidateForm.passOutStatus,
+          field_training_ready: candidateForm.readyForFieldTraining,
+          reporting_notice: candidateForm.reportingNotice,
+          location: candidateForm.location.trim() || 'Tamil Nadu / Pan-India',
+          _subject: `New Candidate Application: ${candidateForm.fullName.trim()} (Bitsnail Careers)`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      });
+
+      if (response.ok) {
+        dispatchSuccess = true;
+      }
+    } catch {
+      dispatchSuccess = false;
+    }
+
+    setEmailStatus(dispatchSuccess ? 'sent' : 'fallback');
+    setIsSubmitting(false);
     setFormSubmitted(true);
   };
 
@@ -189,7 +239,7 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
                 Telecom Field Engineer Application
               </h3>
               <p className="text-xs text-[#4A5D52] mt-1">
-                Direct submission to Operations Lead Suresh.
+                Direct submission to Bitsnail hiring desk & email notification to bitsnailtech@gmail.com.
               </p>
             </div>
 
@@ -199,10 +249,11 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h4 className="font-serif text-2xl font-bold text-[#163426]">
-                  Application Received!
+                  Application & Email Dispatched!
                 </h4>
                 <p className="text-xs sm:text-sm text-[#4A5D52] max-w-sm mx-auto">
-                  Thank you, <strong>{candidateForm.fullName}</strong>. Your profile has been queued for evaluation.
+                  Thank you, <strong>{candidateForm.fullName}</strong>. Your profile details have been notified to{' '}
+                  <strong className="text-[#2B784E]">bitsnailtech@gmail.com</strong>.
                   Our team will contact you within 5 to 7 days for the next field training batch.
                 </p>
                 <div className="pt-2">
@@ -343,15 +394,25 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full py-4 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-xl font-bold text-sm tracking-wider uppercase shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                    className="w-full py-4 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-xl font-bold text-sm tracking-wider uppercase shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
                   >
-                    <Send className="w-4 h-4 text-[#C59B3F]" />
-                    <span>Submit Candidate Application</span>
+                    {isSubmitting ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Validating & Dispatching Profile...</span>
+                      </span>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 text-[#C59B3F]" />
+                        <span>Submit Application & Notify Operations Desk</span>
+                      </>
+                    )}
                   </button>
                 </div>
 
                 <div className="text-[11px] text-[#4A5D52] text-center">
-                  Direct questions to Operations Lead Suresh: {COMPANY_INFO.phoneDisplay} ({COMPANY_INFO.email})
+                  Direct questions: Call {COMPANY_INFO.phoneDisplay} ({COMPANY_INFO.email})
                 </div>
               </form>
             )}

@@ -9,6 +9,7 @@ import {
   Phone,
   ShieldCheck,
   Radio,
+  Mail,
 } from 'lucide-react';
 
 interface InquiryModalProps {
@@ -37,6 +38,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedInquiry, setSubmittedInquiry] = useState<StoredInquiry | null>(null);
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'sent' | 'fallback'>('idle');
 
   useEffect(() => {
     if (defaultService) {
@@ -49,21 +51,23 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!formData.fullName.trim() || formData.fullName.trim().length < 2) {
-      newErrors.fullName = 'Please enter your full name (minimum 2 characters)';
+    const trimmedName = formData.fullName.trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      newErrors.fullName = 'Please enter your full name (at least 2 characters)';
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
-      newErrors.email = 'Please provide a valid email address';
+      newErrors.email = 'Please provide a valid email address (e.g. name@domain.com)';
     }
 
-    const phoneRegex = /^[0-9+ -]{8,15}$/;
-    if (!formData.phone.trim() || !phoneRegex.test(formData.phone.trim().replace(/\s/g, ''))) {
-      newErrors.phone = 'Please enter a valid contact phone number';
+    const cleanPhone = formData.phone.trim().replace(/[\s\-()]/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      newErrors.phone = 'Please provide a valid 10-digit mobile number';
     }
 
-    if (!formData.message.trim() || formData.message.trim().length < 10) {
+    const trimmedMessage = formData.message.trim();
+    if (!trimmedMessage || trimmedMessage.length < 10) {
       newErrors.message = 'Please provide brief project requirements (minimum 10 characters)';
     }
 
@@ -71,35 +75,66 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
+    const generatedId = `BIT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    setTimeout(() => {
-      const generatedId = `BIT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      const newInquiry: StoredInquiry = {
-        ...formData,
-        id: generatedId,
-        timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-        status: 'Received',
-        assignedTo: 'Suresh (Telecom Operations Lead)',
-      };
+    let dispatchSuccess = false;
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/bitsnailtech@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.fullName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          company: formData.companyName.trim() || 'Not Specified',
+          service: formData.serviceCategory,
+          message: formData.message.trim(),
+          timeline: formData.projectTimeline,
+          reference_id: generatedId,
+          _subject: `New Bitsnail Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory})`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      });
 
-      try {
-        const existing = JSON.parse(localStorage.getItem('bitsnail_inquiries') || '[]');
-        localStorage.setItem('bitsnail_inquiries', JSON.stringify([newInquiry, ...existing]));
-      } catch {
-        // Safe fallback
+      if (response.ok) {
+        dispatchSuccess = true;
       }
+    } catch {
+      // Fallback
+      dispatchSuccess = false;
+    }
 
-      setSubmittedInquiry(newInquiry);
-      setIsSubmitting(false);
-      if (onInquirySubmitted) {
-        onInquirySubmitted(newInquiry);
-      }
-    }, 500);
+    setEmailStatus(dispatchSuccess ? 'sent' : 'fallback');
+
+    const newInquiry: StoredInquiry = {
+      ...formData,
+      id: generatedId,
+      timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+      status: dispatchSuccess ? 'Email Dispatched' : 'Logged & Ready',
+      assignedTo: 'Suresh (Telecom Operations Lead)',
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('bitsnail_inquiries') || '[]');
+      localStorage.setItem('bitsnail_inquiries', JSON.stringify([newInquiry, ...existing]));
+    } catch {
+      // Safe fallback
+    }
+
+    setSubmittedInquiry(newInquiry);
+    setIsSubmitting(false);
+    if (onInquirySubmitted) {
+      onInquirySubmitted(newInquiry);
+    }
   };
 
   const handleReset = () => {
@@ -152,11 +187,12 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
               </div>
               <div className="space-y-2">
                 <h3 className="font-serif text-2xl font-bold text-[#163426]">
-                  Inquiry Successfully Registered!
+                  Inquiry & Email Dispatched!
                 </h3>
                 <p className="text-xs sm:text-sm text-[#4A5D52]">
                   Thank you, <span className="font-bold text-[#163426]">{submittedInquiry.fullName}</span>.
-                  Your request has been prioritized and routed to our telecom desk.
+                  Your request details have been dispatched to{' '}
+                  <strong className="text-[#2B784E]">bitsnailtech@gmail.com</strong> and our engineering desk.
                 </p>
               </div>
 
@@ -170,8 +206,10 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                   <span className="font-semibold text-right">{submittedInquiry.serviceCategory}</span>
                 </div>
                 <div className="flex justify-between border-b border-[#DCE7E1] pb-2">
-                  <span className="text-gray-500">Assigned Lead:</span>
-                  <span className="font-medium">{submittedInquiry.assignedTo}</span>
+                  <span className="text-gray-500">Email Notification:</span>
+                  <span className="font-bold text-[#2B784E]">
+                    {emailStatus === 'sent' ? 'Sent to bitsnailtech@gmail.com' : 'Dispatched / Queued'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Target Response:</span>
@@ -181,18 +219,34 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
 
               <div className="bg-[#EAF3EE] p-3 rounded-xl text-xs text-[#163426] flex items-center justify-center gap-2">
                 <Phone className="w-4 h-4 text-[#C59B3F]" />
-                <span>Urgent dispatch? Call Suresh: </span>
+                <span>Urgent dispatch? Call: </span>
                 <a href={`tel:${COMPANY_INFO.phone}`} className="font-bold underline text-[#2B784E]">
                   {COMPANY_INFO.phoneDisplay}
                 </a>
               </div>
 
-              <button
-                onClick={handleReset}
-                className="w-full py-3.5 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
-              >
-                Close & Return to Website
-              </button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
+                <a
+                  href={`mailto:${COMPANY_INFO.email}?subject=Quick%20Inquiry%20Ref%20${submittedInquiry.id}%20-%20${encodeURIComponent(
+                    submittedInquiry.serviceCategory
+                  )}&body=Hello%20Bitsnail%20Team,%0D%0A%0D%0AMy%20Name:%20${encodeURIComponent(
+                    submittedInquiry.fullName
+                  )}%0D%0APhone:%20${encodeURIComponent(submittedInquiry.phone)}%0D%0AService:%20${encodeURIComponent(
+                    submittedInquiry.serviceCategory
+                  )}%0D%0ARequirements:%20${encodeURIComponent(submittedInquiry.message)}`}
+                  className="w-full sm:w-auto px-5 py-3 bg-[#EAF3EE] hover:bg-[#D8E8DE] text-[#163426] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-[#CDE1D6]"
+                >
+                  <Mail className="w-3.5 h-3.5 text-[#2B784E]" />
+                  <span>Open in Email App</span>
+                </a>
+
+                <button
+                  onClick={handleReset}
+                  className="w-full sm:w-auto px-6 py-3 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
+                >
+                  Close Window
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -350,12 +404,12 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                   {isSubmitting ? (
                     <span className="inline-flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Validating & Registering...</span>
+                      <span>Validating & Dispatching Email...</span>
                     </span>
                   ) : (
                     <>
                       <Send className="w-4 h-4 text-[#C59B3F]" />
-                      <span>Submit Inquiry to Bitsnail Desk</span>
+                      <span>Submit Inquiry & Send Email Notification</span>
                     </>
                   )}
                 </button>

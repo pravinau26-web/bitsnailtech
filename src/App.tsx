@@ -111,11 +111,10 @@ export default function App() {
           href={`tel:${COMPANY_INFO.phone}`}
           id="floating-phone-btn"
           className="px-5 py-3 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full shadow-xl flex items-center gap-2.5 font-bold text-xs tracking-wider uppercase transition-all active:scale-95 border border-[#409265] cursor-pointer"
-          title={`Call Suresh: ${COMPANY_INFO.phoneDisplay}`}
+          title={`Call: ${COMPANY_INFO.phoneDisplay}`}
         >
           <Phone className="w-4 h-4 text-[#C59B3F]" />
-          <span className="hidden sm:inline">Call Suresh: {COMPANY_INFO.phoneDisplay}</span>
-          <span className="sm:hidden">Call {COMPANY_INFO.phoneDisplay}</span>
+          <span>Call: {COMPANY_INFO.phoneDisplay}</span>
         </a>
       </div>
 

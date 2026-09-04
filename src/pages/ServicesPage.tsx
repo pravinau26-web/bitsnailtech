@@ -42,12 +42,12 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
   }, [selectedServiceId]);
 
   const serviceIconMap: Record<string, React.ReactNode> = {
-    Radio: <Radio className="w-6 h-6 text-[#2B784E]" />,
-    Sliders: <Sliders className="w-6 h-6 text-[#2B784E]" />,
-    Cpu: <Cpu className="w-6 h-6 text-[#2B784E]" />,
-    TrendingUp: <TrendingUp className="w-6 h-6 text-[#2B784E]" />,
-    ShieldAlert: <ShieldAlert className="w-6 h-6 text-[#2B784E]" />,
-    FileCheck: <FileCheck className="w-6 h-6 text-[#2B784E]" />,
+    Radio: <Radio className="w-6 h-6" />,
+    Sliders: <Sliders className="w-6 h-6" />,
+    Cpu: <Cpu className="w-6 h-6" />,
+    TrendingUp: <TrendingUp className="w-6 h-6" />,
+    ShieldAlert: <ShieldAlert className="w-6 h-6" />,
+    FileCheck: <FileCheck className="w-6 h-6" />,
   };
 
   const currentActiveServiceObj =
@@ -169,37 +169,39 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
             <div
               key={s.id}
               id={`service-card-${s.id}`}
-              className={`bg-white rounded-3xl border ${
-                activeService === s.id ? 'border-[#2B784E] ring-2 ring-[#2B784E]/20' : 'border-[#DCE7E1]'
-              } p-7 shadow-sm hover:shadow-md transition-all flex flex-col justify-between`}
+              className={`bg-white hover:bg-[#163426] rounded-3xl border ${
+                activeService === s.id
+                  ? 'border-[#2B784E] ring-2 ring-[#2B784E]/20'
+                  : 'border-[#DCE7E1] hover:border-[#2B784E]'
+              } p-7 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group cursor-pointer`}
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-[#2B784E] group-hover:text-white flex items-center justify-center group-hover:scale-110 transition-all duration-300">
                     {serviceIconMap[s.iconName]}
                   </div>
-                  <span className="font-mono text-xs font-bold text-[#2B784E] bg-[#EAF3EE] px-2.5 py-1 rounded-full">
+                  <span className="font-mono text-xs font-bold text-[#2B784E] bg-[#EAF3EE] group-hover:bg-[#2B784E] group-hover:text-white px-2.5 py-1 rounded-full transition-colors duration-300">
                     0{index + 1}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-serif text-xl font-bold text-[#163426]">
+                  <h3 className="font-serif text-xl font-bold text-[#163426] group-hover:text-white transition-colors duration-300">
                     {s.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#4A5D52] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#4A5D52] group-hover:text-[#D1E5DA] leading-relaxed transition-colors duration-300">
                     {s.shortDesc}
                   </p>
                 </div>
 
-                <div className="space-y-1.5 pt-2 border-t border-[#EAF3EE]">
-                  <span className="text-[10px] font-bold text-[#2B784E] uppercase tracking-wider block">
+                <div className="space-y-1.5 pt-2 border-t border-[#EAF3EE] group-hover:border-[#24523C] transition-colors duration-300">
+                  <span className="text-[10px] font-bold text-[#2B784E] group-hover:text-[#F0B849] uppercase tracking-wider block transition-colors duration-300">
                     Core Focus Points:
                   </span>
-                  <ul className="space-y-1 text-xs text-[#3E5648]">
+                  <ul className="space-y-1 text-xs text-[#3E5648] group-hover:text-[#C5DDD0] transition-colors duration-300">
                     {s.deliverables.slice(0, 3).map((d, i) => (
                       <li key={i} className="flex items-start gap-1.5">
-                        <span className="text-[#2B784E] font-bold mt-0.5">•</span>
+                        <span className="text-[#2B784E] group-hover:text-[#F0B849] font-bold mt-0.5">•</span>
                         <span className="line-clamp-1">{d}</span>
                       </li>
                     ))}
@@ -207,19 +209,19 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-[#EAF3EE] flex items-center justify-between">
+              <div className="mt-6 pt-4 border-t border-[#EAF3EE] group-hover:border-[#24523C] flex items-center justify-between transition-colors duration-300">
                 <button
                   onClick={() => setActiveService(s.id)}
-                  className="text-xs font-bold text-[#2B784E] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-bold text-[#2B784E] group-hover:text-[#F0B849] hover:underline flex items-center gap-1 cursor-pointer transition-colors duration-300"
                 >
                   <span>Select & Inspect</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => onOpenInquiry(s.title)}
-                  className="px-4 py-1.5 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full text-xs font-bold transition-all cursor-pointer"
+                  className="px-4 py-1.5 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full text-xs font-bold shadow-xs transition-all cursor-pointer"
                 >
-                  Request SOW
+                  Inquire Now
                 </button>
               </div>
             </div>

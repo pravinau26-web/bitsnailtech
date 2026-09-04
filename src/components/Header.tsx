@@ -43,50 +43,8 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 w-full transition-all duration-200">
-      {/* Top Corporate Strip (Light Green / Crisp Branding) */}
-      <div className="bg-[#EAF3EE] text-[#163426] text-xs py-1.5 px-4 sm:px-6 lg:px-8 border-b border-[#D8E6DE]">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 font-medium">
-          {/* Left Info Badges */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <span className="inline-flex items-center gap-1.5 text-[#163426] font-semibold">
-              <Radio className="w-3.5 h-3.5 text-[#2B784E]" />
-              <span>Bitsnail Technologies • Established March 2023</span>
-            </span>
-            <span className="hidden md:inline-flex items-center gap-1.5 text-[#3D5647]">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2B784E]" />
-              <span>FARM Height Safety Certified (WAH)</span>
-            </span>
-            <span className="hidden lg:inline-flex items-center gap-1 text-[#667E70]">
-              <span>Alliance:</span>
-              <strong className="text-[#163426]">Vedang Wireless Teleinfra</strong>
-            </span>
-          </div>
-
-          {/* Right Direct Links */}
-          <div className="flex items-center gap-4 text-xs">
-            <a
-              href={`tel:${COMPANY_INFO.phone}`}
-              id="header-phone-link"
-              className="inline-flex items-center gap-1.5 text-[#163426] hover:text-[#2B784E] font-bold transition-colors py-0.5"
-            >
-              <Phone className="w-3.5 h-3.5 text-[#C59B3F]" />
-              <span>Call Suresh: {COMPANY_INFO.phoneDisplay}</span>
-            </a>
-            <span className="text-[#CBDCD2]">|</span>
-            <a
-              href={`mailto:${COMPANY_INFO.email}`}
-              id="header-email-link"
-              className="hidden sm:inline-flex items-center gap-1.5 text-[#3D5647] hover:text-[#163426] transition-colors py-0.5"
-            >
-              <Mail className="w-3.5 h-3.5 text-[#2B784E]" />
-              <span>{COMPANY_INFO.email}</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
       {/* Floating Modern Pill Navigation (asayinfotech.in inspired) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="bg-white rounded-2xl sm:rounded-full border border-[#DCE7E1] shadow-md shadow-emerald-950/5 px-4 sm:px-6 py-2.5 flex items-center justify-between">
           {/* Brand Logo */}
           <BitsnailLogo
@@ -137,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="header-consultation-btn"
               className="hidden sm:inline-flex items-center gap-2 bg-[#2B784E] hover:bg-[#1F5D3B] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer"
             >
-              <span>Request SOW</span>
+              <span>Inquire Now</span>
               <ArrowRight className="w-3.5 h-3.5 text-[#C59B3F]" />
             </button>
 
@@ -176,7 +134,13 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="flex items-center gap-2">
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#D8E6DE] text-[#163426] font-bold">
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                        isActive
+                          ? 'bg-[#2B784E] text-white'
+                          : 'bg-[#D8E6DE] text-[#163426]'
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -195,14 +159,14 @@ export const Header: React.FC<HeaderProps> = ({
               id="mobile-inquiry-btn"
               className="w-full flex items-center justify-center gap-2 bg-[#2B784E] text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-sm hover:bg-[#1F5D3B]"
             >
-              <span>Submit Project Inquiry</span>
+              <span>Inquire Now</span>
               <ArrowRight className="w-4 h-4 text-[#C59B3F]" />
             </button>
 
-            <div className="bg-[#F4F9F6] p-3 rounded-xl text-xs text-[#3D5647] space-y-1.5 border border-[#DCE7E1]">
+            <div className="bg-[#F4F8F5] p-3 rounded-xl text-xs text-[#3D5647] space-y-1.5 border border-[#DCE7E1]">
               <div className="font-bold text-[#163426] flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5 text-[#C59B3F]" />
-                <span>Contact: {COMPANY_INFO.contactPerson} ({COMPANY_INFO.phoneDisplay})</span>
+                <span>Call: {COMPANY_INFO.phoneDisplay}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-[#2B784E]" />

@@ -263,7 +263,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, onOpenInquiry 
               Ready to Collaborate with Bitsnail?
             </h3>
             <p className="text-xs sm:text-sm text-[#4A5D52]">
-              Connect directly with Operations Lead Suresh for project scopes, RF surveys, or joint consortiums.
+              Connect directly for project scopes, RF surveys, or joint consortiums.
             </p>
           </div>
 

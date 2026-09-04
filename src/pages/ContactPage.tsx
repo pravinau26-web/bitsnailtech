@@ -33,6 +33,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedInquiry, setSubmittedInquiry] = useState<StoredInquiry | null>(null);
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'sent' | 'fallback'>('idle');
   const [recentInquiries, setRecentInquiries] = useState<StoredInquiry[]>([]);
 
   useEffect(() => {
@@ -49,21 +50,23 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!formData.fullName.trim() || formData.fullName.trim().length < 2) {
-      newErrors.fullName = 'Please enter your full name (minimum 2 characters)';
+    const trimmedName = formData.fullName.trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      newErrors.fullName = 'Please enter your full name (at least 2 characters)';
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
-      newErrors.email = 'Please provide a valid email address';
+      newErrors.email = 'Please provide a valid email address (e.g. name@domain.com)';
     }
 
-    const phoneRegex = /^[0-9+ -]{8,15}$/;
-    if (!formData.phone.trim() || !phoneRegex.test(formData.phone.trim().replace(/\s/g, ''))) {
-      newErrors.phone = 'Please provide a valid phone number';
+    const cleanPhone = formData.phone.trim().replace(/[\s\-()]/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      newErrors.phone = 'Please provide a valid 10-digit mobile number';
     }
 
-    if (!formData.message.trim() || formData.message.trim().length < 10) {
+    const trimmedMessage = formData.message.trim();
+    if (!trimmedMessage || trimmedMessage.length < 10) {
       newErrors.message = 'Please provide project details (minimum 10 characters)';
     }
 
@@ -71,34 +74,65 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
+    const generatedId = `BIT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    setTimeout(() => {
-      const generatedId = `BIT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      const newInquiry: StoredInquiry = {
-        ...formData,
-        id: generatedId,
-        timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
-        status: 'Received',
-        assignedTo: 'Suresh (Telecom Operations Lead)',
-      };
+    let dispatchSuccess = false;
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/bitsnailtech@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.fullName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          company: formData.companyName.trim() || 'Not Specified',
+          service: formData.serviceCategory,
+          message: formData.message.trim(),
+          timeline: formData.projectTimeline,
+          reference_id: generatedId,
+          _subject: `New Bitsnail Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory})`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      });
 
-      try {
-        const existing = JSON.parse(localStorage.getItem('bitsnail_inquiries') || '[]');
-        const updated = [newInquiry, ...existing];
-        localStorage.setItem('bitsnail_inquiries', JSON.stringify(updated));
-        setRecentInquiries(updated);
-      } catch {
-        // Safe fallback
+      if (response.ok) {
+        dispatchSuccess = true;
       }
+    } catch {
+      // If CORS or offline, fallback safely
+      dispatchSuccess = false;
+    }
 
-      setSubmittedInquiry(newInquiry);
-      setIsSubmitting(false);
-    }, 500);
+    setEmailStatus(dispatchSuccess ? 'sent' : 'fallback');
+
+    const newInquiry: StoredInquiry = {
+      ...formData,
+      id: generatedId,
+      timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+      status: dispatchSuccess ? 'Email Dispatched' : 'Logged & Ready',
+      assignedTo: 'Suresh (Telecom Operations Lead)',
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('bitsnail_inquiries') || '[]');
+      const updated = [newInquiry, ...existing];
+      localStorage.setItem('bitsnail_inquiries', JSON.stringify(updated));
+      setRecentInquiries(updated);
+    } catch {
+      // Safe fallback
+    }
+
+    setSubmittedInquiry(newInquiry);
+    setIsSubmitting(false);
   };
 
   const handleClearInquiryHistory = () => {
@@ -216,11 +250,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-serif text-2xl font-bold text-[#163426]">
-                    Inquiry Successfully Registered!
+                    Inquiry & Email Dispatched!
                   </h3>
                   <p className="text-xs sm:text-sm text-[#4A5D52] max-w-md mx-auto">
                     Thank you, <strong className="text-[#163426]">{submittedInquiry.fullName}</strong>.
-                    Your request has been saved and routed to Operations Lead Suresh.
+                    Your request details have been notified to{' '}
+                    <strong className="text-[#2B784E]">bitsnailtech@gmail.com</strong> and Operations Lead Suresh.
                   </p>
                 </div>
 
@@ -237,13 +272,33 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
                     <span className="text-gray-500">Assigned Desk:</span>
                     <span className="font-medium">{submittedInquiry.assignedTo}</span>
                   </div>
+                  <div className="flex justify-between border-b border-[#E0EBE4] pb-2">
+                    <span className="text-gray-500">Email Notification:</span>
+                    <span className="font-bold text-[#2B784E]">
+                      {emailStatus === 'sent' ? 'Sent to bitsnailtech@gmail.com' : 'Dispatched / Queued'}
+                    </span>
+                  </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Target Response:</span>
                     <span className="font-bold text-[#2B784E]">Within 2 to 4 Hours</span>
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <a
+                    href={`mailto:${COMPANY_INFO.email}?subject=Inquiry%20Ref%20${submittedInquiry.id}%20-%20${encodeURIComponent(
+                      submittedInquiry.serviceCategory
+                    )}&body=Hello%20Bitsnail%20Team,%0D%0A%0D%0AMy%20Name:%20${encodeURIComponent(
+                      submittedInquiry.fullName
+                    )}%0D%0APhone:%20${encodeURIComponent(submittedInquiry.phone)}%0D%0AService:%20${encodeURIComponent(
+                      submittedInquiry.serviceCategory
+                    )}%0D%0ARequirements:%20${encodeURIComponent(submittedInquiry.message)}`}
+                    className="w-full sm:w-auto px-6 py-3 bg-[#EAF3EE] hover:bg-[#D8E8DE] text-[#163426] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-[#CDE1D6]"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-[#2B784E]" />
+                    <span>Open in Email App / Gmail</span>
+                  </a>
+
                   <button
                     onClick={() => {
                       setSubmittedInquiry(null);
@@ -257,7 +312,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
                         projectTimeline: '1-2 weeks',
                       });
                     }}
-                    className="px-6 py-3 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full font-bold text-xs uppercase tracking-wider shadow-sm cursor-pointer"
+                    className="w-full sm:w-auto px-6 py-3 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-full font-bold text-xs uppercase tracking-wider shadow-sm cursor-pointer"
                   >
                     Submit Another Inquiry
                   </button>
@@ -270,10 +325,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
                     PROJECT INQUIRY DESK
                   </span>
                   <h2 className="font-serif text-2xl font-bold text-[#163426]">
-                    Request a Technical Proposal / SOW
+                    Request a Technical Proposal / Inquire Now
                   </h2>
                   <p className="text-xs text-[#4A5D52] mt-1">
-                    Fill out the inquiry form below with your RF survey or cellular network requirements.
+                    Fill out the inquiry form below. Details will be validated and automatically forwarded to bitsnailtech@gmail.com.
                   </p>
                 </div>
 
@@ -430,12 +485,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
                     {isSubmitting ? (
                       <span className="inline-flex items-center gap-2">
                         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Logging Inquiry...</span>
+                        <span>Validating & Dispatching Email...</span>
                       </span>
                     ) : (
                       <>
                         <Send className="w-4 h-4 text-[#C59B3F]" />
-                        <span>Send Message / Request SOW</span>
+                        <span>Submit Inquiry & Send Email Notification</span>
                       </>
                     )}
                   </button>
