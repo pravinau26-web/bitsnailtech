@@ -92,18 +92,44 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
           Accept: 'application/json',
         },
         body: JSON.stringify({
+          Organization: 'Bitsnail Technologies Pvt Ltd',
+          Official_Logo: 'https://raw.githubusercontent.com/pravinau26-web/bitsnailtech/main/public/assets/logo.svg',
+          Website: 'https://pravinau26-web.github.io/',
+          Helpline: '+91 98416 00155',
+          Official_Email: 'bitsnailtech@gmail.com',
+          Inquiry_Ref: generatedId,
+          // CRITICAL: FormSubmit requires 'name', 'email', 'phone' to trigger autoresponse!
           name: formData.fullName.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
-          company: formData.companyName.trim() || 'Not Specified',
-          service: formData.serviceCategory,
-          message: formData.message.trim(),
+          client_company: formData.companyName.trim() || 'Direct Inquiry',
+          service_category: formData.serviceCategory,
+          project_details: formData.message.trim(),
           timeline: formData.projectTimeline,
-          reference_id: generatedId,
-          _subject: `Quick Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory}) [Ref: ${generatedId}]`,
+          _subject: `[Bitsnail Technologies] Quick Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory}) [Ref: ${generatedId}]`,
           _cc: 'bitsnailtech@gmail.com',
           _replyto: formData.email.trim(),
-          _autoresponse: `Thank you ${formData.fullName.trim()}! Bitsnail Technologies has received your project inquiry (Reference: ${generatedId}) regarding ${formData.serviceCategory}. Our engineering team will review your specifications and get in touch within 2 to 4 hours. Contact: +91 98416 00155.`,
+          _autoresponse: `Thank you for contacting Bitsnail Technologies!
+
+============================================================
+★ BITSNAIL TECHNOLOGIES PVT LTD ★
+Telecom Network Operations & Field Engineering
+Website: https://pravinau26-web.github.io/
+Official Email: bitsnailtech@gmail.com | Helpline: +91 98416 00155
+Official Logo & Brand: Bitsnail Technologies
+============================================================
+
+Inquiry Reference: ${generatedId}
+Client Name: ${formData.fullName.trim()}
+Service Requested: ${formData.serviceCategory}
+Expected Timeline: ${formData.projectTimeline}
+
+We have officially received your technical requirement. Our senior RF & telecom operations desk will review your scope of work and contact you within 2 to 4 hours.
+
+If you have urgent site escalation needs, call our operations lead directly at +91 98416 00155.
+
+Sincerely,
+Bitsnail Technologies Operations & Engineering Desk`,
           _template: 'table',
           _captcha: 'false',
         }),

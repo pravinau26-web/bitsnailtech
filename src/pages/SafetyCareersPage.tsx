@@ -5,6 +5,7 @@ import {
   HIRING_TERMS,
   COMPANY_INFO,
 } from '../data/telecomData';
+import { BitsnailLogo } from '../components/BitsnailLogo';
 import {
   ShieldCheck,
   HardHat,
@@ -19,6 +20,9 @@ import {
   Phone,
   Mail,
   AlertCircle,
+  Printer,
+  FileText,
+  ExternalLink,
 } from 'lucide-react';
 
 interface SafetyCareersPageProps {
@@ -35,7 +39,8 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
     phone: '',
     email: '',
     gender: 'Male',
-    highestQualification: 'B.E / B.Tech / Diploma in ECE / EEE / Telecom',
+    highestQualification: 'Diploma in Electronics & Communication Engineering (ECE)',
+    customQualification: '',
     passOutStatus: 'Pass-out (No Backlogs)',
     readyForFieldTraining: 'Yes, ready for 15-25 days field training',
     reportingNotice: 'Can report within 5-7 days',
@@ -44,6 +49,13 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
   });
 
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submittedData, setSubmittedData] = useState<{
+    id: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    qualification: string;
+  } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sent' | 'fallback'>('idle');
@@ -68,6 +80,16 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
       return;
     }
 
+    const activeQualification =
+      candidateForm.highestQualification === 'Other'
+        ? candidateForm.customQualification.trim() || 'Other Technical Qualification'
+        : candidateForm.highestQualification;
+
+    if (!activeQualification) {
+      setFormError('Please select or specify your educational/technical qualification.');
+      return;
+    }
+
     if (candidateForm.passOutStatus !== 'Pass-out (No Backlogs)') {
       setFormError('As per mandatory hiring terms, only candidates who have cleared all examinations with zero backlogs are eligible.');
       return;
@@ -75,6 +97,7 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
 
     setFormError('');
     setIsSubmitting(true);
+    const generatedAppId = `BIT-ENG-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     let dispatchSuccess = false;
     try {
@@ -86,19 +109,46 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
           Accept: 'application/json',
         },
         body: JSON.stringify({
-          candidate_name: candidateForm.fullName.trim(),
-          candidate_phone: candidateForm.phone.trim(),
-          candidate_email: candidateForm.email.trim(),
+          Organization: 'Bitsnail Technologies Pvt Ltd',
+          Official_Logo: 'https://raw.githubusercontent.com/pravinau26-web/bitsnailtech/main/public/assets/logo.svg',
+          Website: 'https://pravinau26-web.github.io/',
+          Helpline: '+91 98416 00155',
+          Official_Email: 'bitsnailtech@gmail.com',
+          Application_Ref: generatedAppId,
+          // CRITICAL: FormSubmit requires 'name', 'email', 'phone' to trigger autoresponse!
+          name: candidateForm.fullName.trim(),
+          email: candidateForm.email.trim(),
+          phone: candidateForm.phone.trim(),
+          qualification: activeQualification,
           gender: candidateForm.gender,
-          qualification: candidateForm.highestQualification,
           pass_out_status: candidateForm.passOutStatus,
           field_training_ready: candidateForm.readyForFieldTraining,
           reporting_notice: candidateForm.reportingNotice,
           location: candidateForm.location.trim() || 'Tamil Nadu / Pan-India',
-          _subject: `New Candidate Application: ${candidateForm.fullName.trim()} (Bitsnail Careers)`,
+          _subject: `[Bitsnail Technologies] Field Engineer Application: ${candidateForm.fullName.trim()} (Ref: ${generatedAppId})`,
           _cc: 'bitsnailtech@gmail.com',
           _replyto: candidateForm.email.trim(),
-          _autoresponse: `Thank you ${candidateForm.fullName.trim()} for applying to Bitsnail Technologies field engineering team. We have received your profile and qualification details. Our telecom operations desk will evaluate your profile and contact you within 5 to 7 days for the next field training batch. Contact: +91 98416 00155.`,
+          _autoresponse: `Thank you ${candidateForm.fullName.trim()} for applying to Bitsnail Technologies!
+
+============================================================
+★ BITSNAIL TECHNOLOGIES PVT LTD ★
+Telecom Network Operations & Field Engineering
+Website: https://pravinau26-web.github.io/
+Official Email: bitsnailtech@gmail.com | Helpline: +91 98416 00155
+Logo & Brand: Bitsnail Technologies
+============================================================
+
+Application Reference: ${generatedAppId}
+Candidate Name: ${candidateForm.fullName.trim()}
+Qualification: ${activeQualification}
+Status: Application Dispatched & Queued for Evaluation
+
+We have successfully received your Telecom Field Engineer application. Our recruitment desk is reviewing candidate profiles for our upcoming 15-25 days field training deployment batch. Eligible candidates will be contacted via phone (+91 ${candidateForm.phone.trim()}) or email within 5 to 7 working days.
+
+For any immediate updates, contact our operations lead at +91 98416 00155.
+
+Sincerely,
+Bitsnail Technologies HR & Operations Team`,
           _template: 'table',
           _captcha: 'false',
         }),
@@ -111,6 +161,13 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
       dispatchSuccess = false;
     }
 
+    setSubmittedData({
+      id: generatedAppId,
+      fullName: candidateForm.fullName.trim(),
+      email: candidateForm.email.trim(),
+      phone: candidateForm.phone.trim(),
+      qualification: activeQualification,
+    });
     setEmailStatus(dispatchSuccess ? 'sent' : 'fallback');
     setIsSubmitting(false);
     setFormSubmitted(true);
@@ -256,27 +313,100 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
               </p>
             </div>
 
-            {formSubmitted ? (
-              <div className="text-center py-8 space-y-4">
-                <div className="w-16 h-16 bg-[#EAF3EE] text-[#2B784E] rounded-full flex items-center justify-center mx-auto border-2 border-[#2B784E]">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h4 className="font-serif text-2xl font-bold text-[#163426]">
-                  Application & Email Dispatched!
-                </h4>
-                <p className="text-xs sm:text-sm text-[#4A5D52] max-w-sm mx-auto">
-                  Thank you, <strong>{candidateForm.fullName}</strong>. Your profile details have been notified to{' '}
-                  <strong className="text-[#2B784E]">pravinau26@gmail.com</strong> (CC: bitsnailtech@gmail.com), and an auto-acknowledgment email was sent to{' '}
-                  <strong className="text-[#163426]">{candidateForm.email}</strong>.
-                  Our team will contact you within 5 to 7 days for the next field training batch.
-                </p>
-                <div className="pt-2">
-                  <button
-                    onClick={() => setFormSubmitted(false)}
-                    className="px-6 py-2.5 bg-[#2B784E] text-white rounded-full text-xs font-bold uppercase tracking-wider"
-                  >
-                    Submit Another Profile
-                  </button>
+            {formSubmitted && submittedData ? (
+              <div className="space-y-6 py-2">
+                {/* Branded Official Receipt Card */}
+                <div className="bg-[#F8FAF9] rounded-3xl border border-[#DCE7E1] p-6 sm:p-8 space-y-5 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E0EBE4] pb-4">
+                    <div className="flex items-center gap-3">
+                      <BitsnailLogo className="w-9 h-9" />
+                      <div>
+                        <h4 className="font-bold text-[#163426] text-base leading-tight">
+                          Bitsnail Technologies Pvt Ltd
+                        </h4>
+                        <span className="text-[11px] text-[#2B784E] font-semibold block">
+                          Official Candidate Application Receipt
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-widest">
+                        APPLICATION REF NO
+                      </span>
+                      <span className="font-mono text-sm font-bold text-[#2B784E] bg-[#EAF3EE] px-2.5 py-1 rounded-lg inline-block">
+                        {submittedData.id}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between border-b border-[#E0EBE4]/60 pb-2">
+                      <span className="text-gray-500">Applicant Name:</span>
+                      <span className="font-bold text-[#163426]">{submittedData.fullName}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E0EBE4]/60 pb-2">
+                      <span className="text-gray-500">Qualification:</span>
+                      <span className="font-bold text-[#2B784E]">{submittedData.qualification}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E0EBE4]/60 pb-2">
+                      <span className="text-gray-500">Mobile Contact:</span>
+                      <span className="font-medium text-[#163426]">+91 {submittedData.phone}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E0EBE4]/60 pb-2">
+                      <span className="text-gray-500">Applicant Email:</span>
+                      <span className="font-medium text-[#163426]">{submittedData.email}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E0EBE4]/60 pb-2">
+                      <span className="text-gray-500">Operations Desk Delivery:</span>
+                      <span className="font-semibold text-[#2B784E]">
+                        {emailStatus === 'sent'
+                          ? 'Notified to pravinau26@gmail.com (CC: bitsnailtech)'
+                          : 'Profile Queued & Logged'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between pt-1">
+                      <span className="text-gray-500">Auto-Acknowledgment:</span>
+                      <span className="font-semibold text-emerald-700">
+                        Dispatched to {submittedData.email}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-[#EAF3EE] border border-[#D5E6DC] text-xs text-[#163426] flex items-start gap-2.5">
+                    <CheckCircle2 className="w-5 h-5 text-[#2B784E] shrink-0 mt-0.5" />
+                    <p className="leading-relaxed">
+                      Your profile has been officially registered with Bitsnail Technologies. Our telecom operations desk will evaluate your qualifications and contact eligible candidates within <strong>5 to 7 working days</strong> for field induction.
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <button
+                      onClick={() => window.print()}
+                      className="px-4 py-2.5 bg-white border border-[#DCE7E1] hover:border-[#2B784E] text-[#163426] rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+                    >
+                      <Printer className="w-4 h-4 text-[#2B784E]" />
+                      <span>Print Application Receipt</span>
+                    </button>
+
+                    <a
+                      href={`mailto:${submittedData.email}?subject=Bitsnail%20Technologies%20Application%20Receipt%20${submittedData.id}&body=Hello%20${encodeURIComponent(submittedData.fullName)},%0A%0AYour%20Bitsnail%20Technologies%20Field%20Engineer%20Application%20has%20been%20recorded.%0A%0AApplication%20Ref:%20${submittedData.id}%0AQualification:%20${encodeURIComponent(submittedData.qualification)}%0AOfficial%20Desk:%20%2B91%2098416%2000155%20/%20bitsnailtech@gmail.com%0A%0ARegards,%0ABitsnail%20Technologies%20HR`}
+                      className="px-4 py-2.5 bg-[#EAF3EE] hover:bg-[#D8EADB] text-[#2B784E] rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <Mail className="w-4 h-4" />
+                      <span>Open Copy in Mail App</span>
+                    </a>
+
+                    <button
+                      onClick={() => {
+                        setFormSubmitted(false);
+                        setSubmittedData(null);
+                      }}
+                      className="px-4 py-2.5 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all ml-auto cursor-pointer"
+                    >
+                      Submit Another Profile
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -330,6 +460,37 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
                       className="w-full px-4 py-3 bg-[#F4F8F5] border border-[#D5E3DB] rounded-xl text-sm focus:bg-white focus:border-[#2B784E] focus:outline-none transition-all"
                     />
                   </div>
+                </div>
+
+                {/* Educational / Technical Qualification Box */}
+                <div>
+                  <label className="block text-xs font-bold text-[#163426] mb-1 uppercase tracking-wider flex items-center justify-between">
+                    <span>Educational / Technical Qualification *</span>
+                    <span className="text-[10px] text-[#2B784E] font-semibold lowercase">Diploma / Degree / ITI</span>
+                  </label>
+                  <select
+                    value={candidateForm.highestQualification}
+                    onChange={(e) => setCandidateForm({ ...candidateForm, highestQualification: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#F4F8F5] border border-[#D5E3DB] rounded-xl text-sm focus:bg-white focus:border-[#2B784E] focus:outline-none transition-all font-medium text-[#163426]"
+                  >
+                    <option value="Diploma in Electronics & Communication Engineering (ECE)">Diploma in ECE (Electronics & Communication)</option>
+                    <option value="Diploma in Electrical & Electronics Engineering (EEE)">Diploma in EEE (Electrical & Electronics)</option>
+                    <option value="B.E / B.Tech in Electronics & Communication (ECE)">B.E / B.Tech in ECE</option>
+                    <option value="B.E / B.Tech in Electrical / Telecommunication">B.E / B.Tech in Electrical / Telecom</option>
+                    <option value="ITI - Electronics Mechanic / Electrician / Wireman">ITI (Electronics Mechanic / Electrician / Wireman)</option>
+                    <option value="B.Sc / BCA / Other Technical Graduate">B.Sc / BCA / Other Technical Degree</option>
+                    <option value="Other">Other Technical Qualification (Specify)</option>
+                  </select>
+                  {candidateForm.highestQualification === 'Other' && (
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter your specific technical qualification (e.g. M.Sc Electronics)"
+                      value={candidateForm.customQualification}
+                      onChange={(e) => setCandidateForm({ ...candidateForm, customQualification: e.target.value })}
+                      className="mt-2 w-full px-4 py-3 bg-white border border-[#2B784E] rounded-xl text-sm focus:outline-none"
+                    />
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
