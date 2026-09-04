@@ -9,6 +9,8 @@ export const COMPANY_INFO = {
   phone: '9841600155',
   phoneDisplay: '+91 98416 00155',
   email: 'bitsnailtech@gmail.com',
+  // Active test recipient specified by user for testing notification delivery:
+  testNotificationEmail: 'pravinau26@gmail.com',
   corporateAddress: 'Bitsnail Technologies Pvt Ltd, Telecom Network Operations, India',
   hours: 'Monday – Saturday: 08:30 AM – 07:30 PM IST (24/7 Field NOC Support)',
 };

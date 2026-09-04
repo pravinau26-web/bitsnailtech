@@ -83,7 +83,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
 
     let dispatchSuccess = false;
     try {
-      const response = await fetch('https://formsubmit.co/ajax/bitsnailtech@gmail.com', {
+      // Primary test recipient requested by user: pravinau26@gmail.com
+      // with CC to bitsnailtech@gmail.com and auto-acknowledgment sent to customer's email
+      const targetEmail = COMPANY_INFO.testNotificationEmail || 'pravinau26@gmail.com';
+      const response = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +101,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
           message: formData.message.trim(),
           timeline: formData.projectTimeline,
           reference_id: generatedId,
-          _subject: `New Bitsnail Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory})`,
+          _subject: `New Bitsnail Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory}) [Ref: ${generatedId}]`,
+          _cc: 'bitsnailtech@gmail.com',
+          _replyto: formData.email.trim(),
+          _autoresponse: `Thank you for contacting Bitsnail Technologies! We have received your technical inquiry (Reference ID: ${generatedId}) regarding ${formData.serviceCategory}. Our engineering operations team will review your requirements and respond within 2 to 4 hours. Contact: +91 98416 00155.`,
           _template: 'table',
           _captcha: 'false',
         }),
@@ -155,86 +161,86 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
       {/* 2. Main Two-Column Contact Section (asayinfotech.in style) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Contact Cards */}
+          {/* Left Column: Contact Cards with Diverse Dark Themes on Hover */}
           <div className="lg:col-span-5 space-y-5">
-            {/* Card 1: Office / Operations Desk */}
-            <div className="bg-white rounded-3xl border border-[#DCE7E1] p-6 sm:p-7 shadow-sm space-y-3 transition-all hover:border-[#2B784E]">
-              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center">
+            {/* Card 1: Office / Operations Desk - Dark Forest Emerald Hover */}
+            <div className="group bg-white hover:bg-[#0F2C1F] rounded-3xl border border-[#DCE7E1] hover:border-[#2B784E] p-6 sm:p-7 shadow-sm hover:shadow-2xl transition-all duration-300 space-y-3 cursor-pointer">
+              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-[#2B784E] group-hover:text-white group-hover:scale-110 flex items-center justify-center transition-all duration-300">
                 <MapPin className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <span className="text-[11px] font-bold text-[#2B784E] uppercase tracking-widest block">
+                <span className="text-[11px] font-bold text-[#2B784E] group-hover:text-emerald-300 uppercase tracking-widest block transition-colors duration-300">
                   CHENNAI & PAN-INDIA OPERATIONS (HQ)
                 </span>
-                <h3 className="font-bold text-[#163426] text-lg">
+                <h3 className="font-bold text-[#163426] group-hover:text-white text-lg transition-colors duration-300">
                   Bitsnail Technologies Pvt Ltd
                 </h3>
-                <p className="text-xs sm:text-sm text-[#4A5D52] leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#4A5D52] group-hover:text-emerald-100/90 leading-relaxed transition-colors duration-300">
                   Turnkey telecommunication network services across major Tier-1 and regional circles.
                   Headquartered in Tamil Nadu, India.
                 </p>
-                <div className="pt-2 text-xs text-[#2B784E] font-semibold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#2B784E] animate-ping" />
+                <div className="pt-2 text-xs text-[#2B784E] group-hover:text-emerald-300 font-semibold flex items-center gap-1.5 transition-colors duration-300">
+                  <span className="w-2 h-2 rounded-full bg-[#2B784E] group-hover:bg-emerald-400 animate-ping" />
                   <span>Operations Lead: Suresh</span>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Contact Number */}
-            <div className="bg-white rounded-3xl border border-[#DCE7E1] p-6 sm:p-7 shadow-sm space-y-3 transition-all hover:border-[#2B784E]">
-              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center">
+            {/* Card 2: Contact Number - Deep Midnight Navy Hover */}
+            <div className="group bg-white hover:bg-[#0C1B2E] rounded-3xl border border-[#DCE7E1] hover:border-blue-500 p-6 sm:p-7 shadow-sm hover:shadow-2xl transition-all duration-300 space-y-3 cursor-pointer">
+              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-blue-600 group-hover:text-white group-hover:scale-110 flex items-center justify-center transition-all duration-300">
                 <Phone className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <span className="text-[11px] font-bold text-[#2B784E] uppercase tracking-widest block">
+                <span className="text-[11px] font-bold text-[#2B784E] group-hover:text-blue-300 uppercase tracking-widest block transition-colors duration-300">
                   CONTACT NUMBER
                 </span>
                 <a
                   href={`tel:${COMPANY_INFO.phone}`}
-                  className="font-bold text-[#163426] hover:text-[#2B784E] text-xl block transition-colors"
+                  className="font-bold text-[#163426] group-hover:text-white text-xl block transition-colors duration-300"
                 >
                   {COMPANY_INFO.phoneDisplay}
                 </a>
-                <p className="text-xs text-[#4A5D52]">
+                <p className="text-xs text-[#4A5D52] group-hover:text-blue-100/90 transition-colors duration-300">
                   Direct call coordinator: <strong>Suresh</strong>. Available 24/7 for emergency site support and RF survey mobilization.
                 </p>
               </div>
             </div>
 
-            {/* Card 3: Email */}
-            <div className="bg-white rounded-3xl border border-[#DCE7E1] p-6 sm:p-7 shadow-sm space-y-3 transition-all hover:border-[#2B784E]">
-              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center">
+            {/* Card 3: Email - Deep Dark Teal Hover */}
+            <div className="group bg-white hover:bg-[#08262B] rounded-3xl border border-[#DCE7E1] hover:border-teal-400 p-6 sm:p-7 shadow-sm hover:shadow-2xl transition-all duration-300 space-y-3 cursor-pointer">
+              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-teal-600 group-hover:text-white group-hover:scale-110 flex items-center justify-center transition-all duration-300">
                 <Mail className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <span className="text-[11px] font-bold text-[#2B784E] uppercase tracking-widest block">
+                <span className="text-[11px] font-bold text-[#2B784E] group-hover:text-teal-300 uppercase tracking-widest block transition-colors duration-300">
                   OFFICIAL EMAIL ADDRESS
                 </span>
                 <a
                   href={`mailto:${COMPANY_INFO.email}`}
-                  className="font-bold text-[#163426] hover:text-[#2B784E] text-base sm:text-lg block transition-colors"
+                  className="font-bold text-[#163426] group-hover:text-white text-base sm:text-lg block transition-colors duration-300"
                 >
                   {COMPANY_INFO.email}
                 </a>
-                <p className="text-xs text-[#4A5D52]">
+                <p className="text-xs text-[#4A5D52] group-hover:text-teal-100/90 transition-colors duration-300">
                   Send tender inquiries, Statements of Work (SOW), parameter tuning requests, or RF audit scopes.
                 </p>
               </div>
             </div>
 
-            {/* Card 4: Alliance Playrole */}
-            <div className="bg-white rounded-3xl border border-[#DCE7E1] p-6 sm:p-7 shadow-sm space-y-3 transition-all hover:border-[#2B784E]">
-              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#C59B3F] flex items-center justify-center">
+            {/* Card 4: Alliance Playrole - Deep Warm Bronze/Amber Night Hover */}
+            <div className="group bg-white hover:bg-[#261A0E] rounded-3xl border border-[#DCE7E1] hover:border-amber-400 p-6 sm:p-7 shadow-sm hover:shadow-2xl transition-all duration-300 space-y-3 cursor-pointer">
+              <div className="w-12 h-12 rounded-2xl bg-[#EAF3EE] text-[#C59B3F] group-hover:bg-amber-600 group-hover:text-white group-hover:scale-110 flex items-center justify-center transition-all duration-300">
                 <Building2 className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <span className="text-[11px] font-bold text-[#C59B3F] uppercase tracking-widest block">
+                <span className="text-[11px] font-bold text-[#C59B3F] group-hover:text-amber-300 uppercase tracking-widest block transition-colors duration-300">
                   OUR PLAYROLE / ALLIANCE
                 </span>
-                <h3 className="font-bold text-[#163426] text-base sm:text-lg">
+                <h3 className="font-bold text-[#163426] group-hover:text-white text-base sm:text-lg transition-colors duration-300">
                   Vedang Wireless Teleinfra Pvt Ltd
                 </h3>
-                <p className="text-xs text-[#4A5D52]">
+                <p className="text-xs text-[#4A5D52] group-hover:text-amber-100/90 transition-colors duration-300">
                   Strategic telecom execution alliance and deployment partner for leading cellular operators.
                 </p>
               </div>
@@ -254,8 +260,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
                   </h3>
                   <p className="text-xs sm:text-sm text-[#4A5D52] max-w-md mx-auto">
                     Thank you, <strong className="text-[#163426]">{submittedInquiry.fullName}</strong>.
-                    Your request details have been notified to{' '}
-                    <strong className="text-[#2B784E]">bitsnailtech@gmail.com</strong> and Operations Lead Suresh.
+                    Your request details have been dispatched to{' '}
+                    <strong className="text-[#2B784E]">pravinau26@gmail.com</strong> (CC: bitsnailtech@gmail.com) and an acknowledgment receipt sent to{' '}
+                    <strong className="text-[#163426]">{submittedInquiry.email}</strong>.
                   </p>
                 </div>
 
@@ -273,9 +280,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
                     <span className="font-medium">{submittedInquiry.assignedTo}</span>
                   </div>
                   <div className="flex justify-between border-b border-[#E0EBE4] pb-2">
-                    <span className="text-gray-500">Email Notification:</span>
+                    <span className="text-gray-500">Notification Routing:</span>
                     <span className="font-bold text-[#2B784E]">
-                      {emailStatus === 'sent' ? 'Sent to bitsnailtech@gmail.com' : 'Dispatched / Queued'}
+                      {emailStatus === 'sent' ? 'Sent to pravinau26@gmail.com (CC: bitsnailtech)' : 'Dispatched / Active'}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -532,17 +539,17 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onNavigate, prefillSer
               {recentInquiries.map((inq) => (
                 <div
                   key={inq.id}
-                  className="bg-[#F4F8F5] p-4 rounded-2xl border border-[#DCE7E1] space-y-2 text-xs"
+                  className="group bg-[#F4F8F5] hover:bg-[#162024] p-4 rounded-2xl border border-[#DCE7E1] hover:border-slate-500 space-y-2 text-xs transition-all duration-300 shadow-2xs hover:shadow-lg cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-[#2B784E]">{inq.id}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-[#EAF3EE] text-[#163426] font-semibold text-[10px]">
+                    <span className="font-mono font-bold text-[#2B784E] group-hover:text-emerald-300">{inq.id}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-[#EAF3EE] group-hover:bg-white/20 text-[#163426] group-hover:text-white font-semibold text-[10px] transition-colors">
                       {inq.status}
                     </span>
                   </div>
-                  <div className="font-semibold text-[#163426]">{inq.serviceCategory}</div>
-                  <p className="text-[#4A5D52] line-clamp-2">{inq.message}</p>
-                  <div className="text-[10px] text-gray-400 pt-1 border-t border-[#DCE7E1]/50 flex justify-between">
+                  <div className="font-semibold text-[#163426] group-hover:text-white transition-colors">{inq.serviceCategory}</div>
+                  <p className="text-[#4A5D52] group-hover:text-slate-300 line-clamp-2 transition-colors">{inq.message}</p>
+                  <div className="text-[10px] text-gray-400 group-hover:text-slate-400 pt-1 border-t border-[#DCE7E1]/50 group-hover:border-white/10 flex justify-between transition-colors">
                     <span>{inq.timestamp}</span>
                     <span>Lead: Suresh</span>
                   </div>

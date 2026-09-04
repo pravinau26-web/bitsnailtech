@@ -78,7 +78,8 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
 
     let dispatchSuccess = false;
     try {
-      const response = await fetch('https://formsubmit.co/ajax/bitsnailtech@gmail.com', {
+      const targetEmail = COMPANY_INFO.testNotificationEmail || 'pravinau26@gmail.com';
+      const response = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,6 +96,9 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
           reporting_notice: candidateForm.reportingNotice,
           location: candidateForm.location.trim() || 'Tamil Nadu / Pan-India',
           _subject: `New Candidate Application: ${candidateForm.fullName.trim()} (Bitsnail Careers)`,
+          _cc: 'bitsnailtech@gmail.com',
+          _replyto: candidateForm.email.trim(),
+          _autoresponse: `Thank you ${candidateForm.fullName.trim()} for applying to Bitsnail Technologies field engineering team. We have received your profile and qualification details. Our telecom operations desk will evaluate your profile and contact you within 5 to 7 days for the next field training batch. Contact: +91 98416 00155.`,
           _template: 'table',
           _captcha: 'false',
         }),
@@ -146,33 +150,42 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#F4F8F5] p-6 rounded-2xl border border-[#DCE7E1] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center">
+            {/* Box 1: FARM Certification - Dark Emerald Theme Hover */}
+            <div className="group bg-[#F4F8F5] hover:bg-[#0F2C1F] p-6 rounded-2xl border border-[#DCE7E1] hover:border-[#2B784E] space-y-3 transition-all duration-300 hover:shadow-xl cursor-pointer">
+              <div className="w-10 h-10 rounded-xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-[#2B784E] group-hover:text-white flex items-center justify-center transition-all duration-300">
                 <Award className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-[#163426] text-base">FARM Certification</h3>
-              <p className="text-xs text-[#4A5D52] leading-relaxed">
+              <h3 className="font-bold text-[#163426] group-hover:text-white text-base transition-colors duration-300">
+                FARM Certification
+              </h3>
+              <p className="text-xs text-[#4A5D52] group-hover:text-emerald-100/90 leading-relaxed transition-colors duration-300">
                 Safety Training on Height & Rescue, industry accepted WAH (Work At Height) –{' '}
-                <strong className="text-[#163426]">All Project Field Teams are certified</strong>.
+                <strong className="text-[#163426] group-hover:text-white">All Project Field Teams are certified</strong>.
               </p>
             </div>
 
-            <div className="bg-[#F4F8F5] p-6 rounded-2xl border border-[#DCE7E1] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center">
+            {/* Box 2: Global & Pan-India Validity - Deep Midnight Navy Theme Hover */}
+            <div className="group bg-[#F4F8F5] hover:bg-[#0C1B2E] p-6 rounded-2xl border border-[#DCE7E1] hover:border-blue-500 space-y-3 transition-all duration-300 hover:shadow-xl cursor-pointer">
+              <div className="w-10 h-10 rounded-xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all duration-300">
                 <Building2 className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-[#163426] text-base">Global & Pan-India Validity</h3>
-              <p className="text-xs text-[#4A5D52] leading-relaxed">
+              <h3 className="font-bold text-[#163426] group-hover:text-white text-base transition-colors duration-300">
+                Global & Pan-India Validity
+              </h3>
+              <p className="text-xs text-[#4A5D52] group-hover:text-blue-100/90 leading-relaxed transition-colors duration-300">
                 FARM Certification is valid across India and overseas & it is compulsory to work in Telecom.
               </p>
             </div>
 
-            <div className="bg-[#F4F8F5] p-6 rounded-2xl border border-[#DCE7E1] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EAF3EE] text-[#2B784E] flex items-center justify-center">
+            {/* Box 3: EN Standard PPE Kits - Deep Warm Bronze Theme Hover */}
+            <div className="group bg-[#F4F8F5] hover:bg-[#261A0E] p-6 rounded-2xl border border-[#DCE7E1] hover:border-amber-500 space-y-3 transition-all duration-300 hover:shadow-xl cursor-pointer">
+              <div className="w-10 h-10 rounded-xl bg-[#EAF3EE] text-[#2B784E] group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center transition-all duration-300">
                 <HardHat className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-[#163426] text-base">EN Standard PPE Kits</h3>
-              <p className="text-xs text-[#4A5D52] leading-relaxed">
+              <h3 className="font-bold text-[#163426] group-hover:text-white text-base transition-colors duration-300">
+                EN Standard PPE Kits
+              </h3>
+              <p className="text-xs text-[#4A5D52] group-hover:text-amber-100/90 leading-relaxed transition-colors duration-300">
                 Special Focus and Drive for OHS measures Ensuring Highest level of safety standards and all project engineers are equipped with EN standard PPE kits.
               </p>
             </div>
@@ -201,16 +214,16 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
               {HIRING_TERMS.criteria.map((term, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 p-3.5 rounded-2xl bg-[#F4F8F5] border border-[#DCE7E1]"
+                  className="group flex items-start gap-3 p-3.5 rounded-2xl bg-[#F4F8F5] hover:bg-[#162024] border border-[#DCE7E1] hover:border-slate-500 transition-all duration-300 hover:shadow-md cursor-pointer"
                 >
-                  <div className="w-6 h-6 rounded-full bg-[#2B784E] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-[#2B784E] group-hover:bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 transition-colors">
                     {index + 1}
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-[#163426] uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-[#163426] group-hover:text-white uppercase tracking-wider transition-colors">
                       {term.heading}
                     </h4>
-                    <p className="text-xs text-[#4A5D52] mt-0.5 leading-relaxed">
+                    <p className="text-xs text-[#4A5D52] group-hover:text-slate-200 mt-0.5 leading-relaxed transition-colors">
                       {term.detail}
                     </p>
                   </div>
@@ -218,13 +231,13 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
               ))}
             </div>
 
-            <div className="p-4 rounded-2xl bg-[#EAF3EE] border border-[#D5E6DC] text-xs text-[#163426] space-y-1">
-              <span className="font-bold flex items-center gap-1.5 text-[#2B784E]">
+            <div className="group p-4 rounded-2xl bg-[#EAF3EE] hover:bg-[#0D2F35] border border-[#D5E6DC] hover:border-teal-500 text-xs text-[#163426] space-y-1 transition-all duration-300 cursor-pointer">
+              <span className="font-bold flex items-center gap-1.5 text-[#2B784E] group-hover:text-teal-300 transition-colors">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Field Deployment Alliance</span>
               </span>
-              <p className="text-xs text-[#4A5D52]">
-                Projects executed in consortium with <strong>Vedang Wireless Teleinfra Pvt Ltd</strong>.
+              <p className="text-xs text-[#4A5D52] group-hover:text-teal-100 transition-colors">
+                Projects executed in consortium with <strong className="group-hover:text-white">Vedang Wireless Teleinfra Pvt Ltd</strong>.
               </p>
             </div>
           </div>
@@ -239,7 +252,7 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
                 Telecom Field Engineer Application
               </h3>
               <p className="text-xs text-[#4A5D52] mt-1">
-                Direct submission to Bitsnail hiring desk & email notification to bitsnailtech@gmail.com.
+                Direct submission to Bitsnail hiring desk & email notification to pravinau26@gmail.com (CC: bitsnailtech@gmail.com).
               </p>
             </div>
 
@@ -253,7 +266,8 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
                 </h4>
                 <p className="text-xs sm:text-sm text-[#4A5D52] max-w-sm mx-auto">
                   Thank you, <strong>{candidateForm.fullName}</strong>. Your profile details have been notified to{' '}
-                  <strong className="text-[#2B784E]">bitsnailtech@gmail.com</strong>.
+                  <strong className="text-[#2B784E]">pravinau26@gmail.com</strong> (CC: bitsnailtech@gmail.com), and an auto-acknowledgment email was sent to{' '}
+                  <strong className="text-[#163426]">{candidateForm.email}</strong>.
                   Our team will contact you within 5 to 7 days for the next field training batch.
                 </p>
                 <div className="pt-2">

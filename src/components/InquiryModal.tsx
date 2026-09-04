@@ -84,7 +84,8 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
 
     let dispatchSuccess = false;
     try {
-      const response = await fetch('https://formsubmit.co/ajax/bitsnailtech@gmail.com', {
+      const targetEmail = COMPANY_INFO.testNotificationEmail || 'pravinau26@gmail.com';
+      const response = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +100,10 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
           message: formData.message.trim(),
           timeline: formData.projectTimeline,
           reference_id: generatedId,
-          _subject: `New Bitsnail Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory})`,
+          _subject: `Quick Inquiry: ${formData.fullName.trim()} (${formData.serviceCategory}) [Ref: ${generatedId}]`,
+          _cc: 'bitsnailtech@gmail.com',
+          _replyto: formData.email.trim(),
+          _autoresponse: `Thank you ${formData.fullName.trim()}! Bitsnail Technologies has received your project inquiry (Reference: ${generatedId}) regarding ${formData.serviceCategory}. Our engineering team will review your specifications and get in touch within 2 to 4 hours. Contact: +91 98416 00155.`,
           _template: 'table',
           _captcha: 'false',
         }),
@@ -192,7 +196,8 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                 <p className="text-xs sm:text-sm text-[#4A5D52]">
                   Thank you, <span className="font-bold text-[#163426]">{submittedInquiry.fullName}</span>.
                   Your request details have been dispatched to{' '}
-                  <strong className="text-[#2B784E]">bitsnailtech@gmail.com</strong> and our engineering desk.
+                  <strong className="text-[#2B784E]">pravinau26@gmail.com</strong> (CC: bitsnailtech@gmail.com) and an auto-acknowledgment sent to{' '}
+                  <strong className="text-[#163426]">{submittedInquiry.email}</strong>.
                 </p>
               </div>
 
@@ -208,7 +213,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                 <div className="flex justify-between border-b border-[#DCE7E1] pb-2">
                   <span className="text-gray-500">Email Notification:</span>
                   <span className="font-bold text-[#2B784E]">
-                    {emailStatus === 'sent' ? 'Sent to bitsnailtech@gmail.com' : 'Dispatched / Queued'}
+                    {emailStatus === 'sent' ? 'Dispatched to pravinau26@gmail.com (CC: bitsnailtech)' : 'Dispatched / Queued'}
                   </span>
                 </div>
                 <div className="flex justify-between">
