@@ -7,6 +7,10 @@ import {
 } from '../data/telecomData';
 import { BitsnailLogo } from '../components/BitsnailLogo';
 import {
+  dispatchFormSubmission,
+  createAcknowledgmentMailtoUrl,
+} from '../utils/emailService';
+import {
   ShieldCheck,
   HardHat,
   AlertTriangle,
@@ -99,67 +103,24 @@ export const SafetyCareersPage: React.FC<SafetyCareersPageProps> = ({
     setIsSubmitting(true);
     const generatedAppId = `BIT-ENG-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    let dispatchSuccess = false;
-    try {
-      const targetEmail = COMPANY_INFO.testNotificationEmail || 'pravinau26@gmail.com';
-      const response = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          Organization: 'Bitsnail Technologies Pvt Ltd',
-          Official_Logo: 'https://raw.githubusercontent.com/pravinau26-web/bitsnailtech/main/public/assets/logo.svg',
-          Website: 'https://pravinau26-web.github.io/',
-          Helpline: '+91 98416 00155',
-          Official_Email: 'bitsnailtech@gmail.com',
-          Application_Ref: generatedAppId,
-          // CRITICAL: FormSubmit requires 'name', 'email', 'phone' to trigger autoresponse!
-          name: candidateForm.fullName.trim(),
-          email: candidateForm.email.trim(),
-          phone: candidateForm.phone.trim(),
-          qualification: activeQualification,
-          gender: candidateForm.gender,
-          pass_out_status: candidateForm.passOutStatus,
-          field_training_ready: candidateForm.readyForFieldTraining,
-          reporting_notice: candidateForm.reportingNotice,
-          location: candidateForm.location.trim() || 'Tamil Nadu / Pan-India',
-          _subject: `[Bitsnail Technologies] Field Engineer Application: ${candidateForm.fullName.trim()} (Ref: ${generatedAppId})`,
-          _cc: 'bitsnailtech@gmail.com',
-          _replyto: candidateForm.email.trim(),
-          _autoresponse: `Thank you ${candidateForm.fullName.trim()} for applying to Bitsnail Technologies!
-
-============================================================
-★ BITSNAIL TECHNOLOGIES PVT LTD ★
-Telecom Network Operations & Field Engineering
-Website: https://pravinau26-web.github.io/
-Official Email: bitsnailtech@gmail.com | Helpline: +91 98416 00155
-Logo & Brand: Bitsnail Technologies
-============================================================
-
-Application Reference: ${generatedAppId}
-Candidate Name: ${candidateForm.fullName.trim()}
-Qualification: ${activeQualification}
-Status: Application Dispatched & Queued for Evaluation
-
-We have successfully received your Telecom Field Engineer application. Our recruitment desk is reviewing candidate profiles for our upcoming 15-25 days field training deployment batch. Eligible candidates will be contacted via phone (+91 ${candidateForm.phone.trim()}) or email within 5 to 7 working days.
-
-For any immediate updates, contact our operations lead at +91 98416 00155.
-
-Sincerely,
-Bitsnail Technologies HR & Operations Team`,
-          _template: 'table',
-          _captcha: 'false',
-        }),
-      });
-
-      if (response.ok) {
-        dispatchSuccess = true;
-      }
-    } catch {
-      dispatchSuccess = false;
-    }
+    const result = await dispatchFormSubmission({
+      type: 'career',
+      referenceId: generatedAppId,
+      name: candidateForm.fullName.trim(),
+      email: candidateForm.email.trim(),
+      phone: candidateForm.phone.trim(),
+      subject: `[Bitsnail Technologies] Field Engineer Application: ${candidateForm.fullName.trim()} (Ref: ${generatedAppId})`,
+      details: {
+        Role_Applied: 'Telecom Field Engineer (Trainee)',
+        Qualification: activeQualification,
+        Gender: candidateForm.gender,
+        Academic_Status: candidateForm.passOutStatus,
+        Field_Training: candidateForm.readyForFieldTraining,
+        Reporting_Notice: candidateForm.reportingNotice,
+        Preferred_Location: candidateForm.location.trim() || 'Tamil Nadu / Pan-India',
+        Branding: 'Bitsnail Technologies (Official Logo Attached)',
+      },
+    });
 
     setSubmittedData({
       id: generatedAppId,
@@ -168,7 +129,7 @@ Bitsnail Technologies HR & Operations Team`,
       phone: candidateForm.phone.trim(),
       qualification: activeQualification,
     });
-    setEmailStatus(dispatchSuccess ? 'sent' : 'fallback');
+    setEmailStatus(result.success ? 'sent' : 'fallback');
     setIsSubmitting(false);
     setFormSubmitted(true);
   };
@@ -390,11 +351,17 @@ Bitsnail Technologies HR & Operations Team`,
                     </button>
 
                     <a
-                      href={`mailto:${submittedData.email}?subject=Bitsnail%20Technologies%20Application%20Receipt%20${submittedData.id}&body=Hello%20${encodeURIComponent(submittedData.fullName)},%0A%0AYour%20Bitsnail%20Technologies%20Field%20Engineer%20Application%20has%20been%20recorded.%0A%0AApplication%20Ref:%20${submittedData.id}%0AQualification:%20${encodeURIComponent(submittedData.qualification)}%0AOfficial%20Desk:%20%2B91%2098416%2000155%20/%20bitsnailtech@gmail.com%0A%0ARegards,%0ABitsnail%20Technologies%20HR`}
-                      className="px-4 py-2.5 bg-[#EAF3EE] hover:bg-[#D8EADB] text-[#2B784E] rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
+                      href={createAcknowledgmentMailtoUrl(
+                        submittedData.email,
+                        submittedData.fullName,
+                        submittedData.id,
+                        'career',
+                        `Field Engineer Application (${submittedData.qualification})`
+                      )}
+                      className="px-4 py-2.5 bg-[#2B784E] hover:bg-[#1F5D3B] text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
                     >
                       <Mail className="w-4 h-4" />
-                      <span>Open Copy in Mail App</span>
+                      <span>Send Official Copy to My Email</span>
                     </a>
 
                     <button
